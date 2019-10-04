@@ -23,9 +23,9 @@ public:
     bool newMessage(QTcpSocket *client, QByteArray message);
 
 signals:
-    void newConnection(int, const QString&);
-    void newDisconnection(int);
-    void newMessageReceived(int,QByteArray);
+    void newConnection(qintptr, const QString&);
+    void newDisconnection(qintptr);
+    void newMessageReceived(qintptr,QByteArray);
 
 private slots:
     void onNewConnection_TcpServer();
@@ -35,7 +35,7 @@ private slots:
 private:
     struct InfoClient
     {
-        int socketDescriptor;
+        qintptr socketDescriptor;
         quint16 sizeBuffer;
     };
     QTcpServer* m_tcpServer;

@@ -5,8 +5,6 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
-#include "dataGeodrone.h"
-
 TcpServerClients::TcpServerClients(QObject *parent) :
     QObject(parent),
     m_tcpServer(new QTcpServer(this)),
@@ -34,7 +32,7 @@ bool TcpServerClients::start()
 
     if(m_tcpServer)
     {
-        if(m_tcpServer->listen(QHostAddress::Any, TCPSERVER_PORT))
+        if(m_tcpServer->listen(QHostAddress::Any, 8083))
         {
             qDebug() << "Server listening...";
             success = true;
