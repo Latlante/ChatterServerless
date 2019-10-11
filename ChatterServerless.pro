@@ -19,6 +19,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     Communication/tcpserverclients.cpp \
     Communication/tcpsocketclient.cpp \
+    Configuration/configurationcontacts.cpp \
+    Configuration/infocontact.cpp \
+    Models/contact.cpp \
     Models/itemtreeusers.cpp \
     Models/modeltreeusers.cpp \
     main.cpp \
@@ -27,6 +30,9 @@ SOURCES += \
 HEADERS += \
     Communication/tcpserverclients.h \
     Communication/tcpsocketclient.h \
+    Configuration/configurationcontacts.h \
+    Configuration/infocontact.h \
+    Models/contact.h \
     Models/itemtreeusers.h \
     Models/modeltreeusers.h \
     mainwindow.h
