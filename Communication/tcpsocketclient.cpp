@@ -6,27 +6,48 @@
 
 TcpSocketClient::TcpSocketClient(QObject *parent) :
     QObject(parent),
-    m_socket(new QTcpSocket(this)),
+    m_socketIn(nullptr),
+    m_socketOut(new QTcpSocket(this)),
     m_ipAddress(""),
     m_port(0),
     m_sizeAnswerAsynchrone(0)
 {
-    connect(m_socket, &QTcpSocket::connected, this, &TcpSocketClient::connected);
-    connect(m_socket, &QTcpSocket::disconnected, this, &TcpSocketClient::disconnected);
-    connect(m_socket, &QTcpSocket::readyRead, this, &TcpSocketClient::onReadyRead_Socket);
+    connect(m_socketOut, &QTcpSocket::connected, this, &TcpSocketClient::connected);
+    connect(m_socketOut, &QTcpSocket::disconnected, this, &TcpSocketClient::disconnected);
+    connect(m_socket, &QTcpSocket::readyRead, this, &TcpSocketClient::onReadyRead_SocketIn);
 }
 
 TcpSocketClient::~TcpSocketClient()
 {
-    delete m_socket;
+    deleteSocketIn();
+    deleteSocketOut();
 }
 
 /**************************************
  ***        GETTERS / SETTERS       ***
  *************************************/
+void TcpSocketClient::setSocketIn(QTcpSocket *socket)
+{
+    if(socket != nullptr)
+    {
+        deleteSocketIn();
+
+        m_socketIn = socket;
+        connect(m_socketIn, &QTcpSocket::readyRead, this, &TcpSocketClient::onReadyRead_SocketIn);
+    }
+}
+
 bool TcpSocketClient::isConnected()
 {
-    return m_socket->isOpen();
+    bool connected = false;
+
+    if((m_socketIn != nullptr) && (m_socketIn->isOpen())
+            && (m_socketOut != nullptr) && (m_socketOut->isOpen()))
+    {
+        connected = true;
+    }
+
+    return connected;
 }
 
 /**************************************
@@ -36,8 +57,8 @@ void TcpSocketClient::tryToConnect()
 {
     if((m_ipAddress != "") && (m_port > 0))
     {
-        m_socket->abort();
-        m_socket->connectToHost(QHostAddress(m_ipAddress), m_port);
+        m_socketOut->abort();
+        m_socketOut->connectToHost(QHostAddress(m_ipAddress), m_port);
     }
 }
 
@@ -45,7 +66,7 @@ bool TcpSocketClient::sendMessage(const QString &message)
 {
     bool success = false;
 
-    if(m_socket != nullptr)
+    if(m_socketOut != nullptr)
     {
         //init request
         QByteArray requestToSend;
@@ -53,7 +74,7 @@ bool TcpSocketClient::sendMessage(const QString &message)
         dataToSend << message.length();
         dataToSend << message;
 
-        qint64 byteWritten = m_socket->write(requestToSend);
+        qint64 byteWritten = m_socketOut->write(requestToSend);
         if(byteWritten == requestToSend.length())
             success = true;
         else
@@ -68,24 +89,24 @@ bool TcpSocketClient::sendMessage(const QString &message)
 /**************************************
  ***     PRIVATE  SLOTS FUNCTIONS   ***
  *************************************/
-void TcpSocketClient::onReadyRead_Socket()
+void TcpSocketClient::onReadyRead_SocketIn()
 {
     qDebug() << __PRETTY_FUNCTION__;
 
     //init the answer
-    QDataStream requestToRead(m_socket);
+    QDataStream requestToRead(m_socketIn);
 
     if(m_sizeAnswerAsynchrone == 0)
     {
         //Check we have the minimum to start reading
-        if(m_socket->bytesAvailable() < sizeof(quint64))
+        if(m_socketIn->bytesAvailable() < sizeof(quint64))
             return;
 
         //Check we have all the answer
         requestToRead >> m_sizeAnswerAsynchrone;
     }
 
-    if(m_socket->bytesAvailable() < m_sizeAnswerAsynchrone)
+    if(m_socketIn->bytesAvailable() < m_sizeAnswerAsynchrone)
         return;
 
     //From here, we have everything, so we can get all the message
@@ -99,3 +120,20 @@ void TcpSocketClient::onReadyRead_Socket()
 /**************************************
  ***        PRIVATE FUNCTIONS       ***
  *************************************/
+void TcpSocketClient::deleteSocketIn()
+{
+    if(m_socketIn != nullptr)
+    {
+        m_socketIn->abort();
+        delete m_socketIn;
+    }
+}
+
+void TcpSocketClient::deleteSocketOut()
+{
+    if(m_socketOut != nullptr)
+    {
+        m_socketOut->abort();
+        delete m_socketOut;
+    }
+}
