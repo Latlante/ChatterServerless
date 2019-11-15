@@ -63,7 +63,7 @@ void TcpServerClients::onNewConnection_TcpServer()
     qDebug() << __PRETTY_FUNCTION__;
     QTcpSocket* newClient = m_tcpServer->nextPendingConnection();
 
-    emit newConnection(newClient->socketDescriptor(), newClient->peerAddress().toString());
+    emit newConnection(newClient->socketDescriptor(), newClient->peerAddress());
 }
 
 /**************************************

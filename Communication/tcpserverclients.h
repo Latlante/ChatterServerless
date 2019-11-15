@@ -1,9 +1,8 @@
 #ifndef TCPSERVERCLIENTS_H
 #define TCPSERVERCLIENTS_H
 
-
+#include <QHostAddress>
 #include <QMap>
-
 #include <QObject>
 
 class QTcpServer;
@@ -20,7 +19,7 @@ public:
     bool isRunning();
 
 signals:
-    void newConnection(qintptr, const QString&);
+    void newConnection(qintptr, const QHostAddress&);
 
 private slots:
     void onNewConnection_TcpServer();

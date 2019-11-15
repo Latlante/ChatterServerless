@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Communication/contactshandler.cpp \
     Communication/tcpserverclients.cpp \
     Communication/tcpsocketclient.cpp \
     Configuration/configurationcontacts.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    Communication/contactshandler.h \
     Communication/tcpserverclients.h \
     Communication/tcpsocketclient.h \
     Configuration/configurationcontacts.h \
